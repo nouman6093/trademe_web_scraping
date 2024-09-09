@@ -10,6 +10,7 @@ import time
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
+from openpyxl.utils import get_column_letter
 
 # Setup Chrome options for Colab or local execution
 chrome_options = Options()
@@ -288,63 +289,81 @@ def get_product_info(url, selling_data):
     return data
 
 # Function to save data to an Excel file
-def save_to_excel(all_data, filename="trademe_scraped_data.xlsx"):
-    file_path = os.path.join("/content/", filename)
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+def save_to_excel(all_data, selling_data, filename="trademe_scraped_data.xlsx"):
+    file_path = os.path.join("/content/", filename)
+    os.makedirs(os.path.dirname(file_path), exist_ok=True) 
 
-    df = pd.DataFrame(all_data)
+    df = pd.DataFrame(all_data) 
 
-    if os.path.exists(file_path):
-        try:
-            book = load_workbook(file_path)
-            writer = pd.ExcelWriter(file_path, engine='openpyxl')
-            writer.book = book
+    if os.path.exists(file_path):
+        try:
+            book = load_workbook(file_path)
+            writer = pd.ExcelWriter(file_path, engine='openpyxl')
+            writer.book = book 
 
-            if 'Scraped Data' in writer.book.sheetnames:
-                startrow = writer.book['Scraped Data'].max_row
-            else:
-                startrow = 0
+            # Saving the main scraped data
+            if 'Scraped Data' in writer.book.sheetnames:
+                startrow = writer.book['Scraped Data'].max_row
+            else:
+                startrow = 0 
 
-            df.to_excel(writer, index=False, header=startrow == 0, sheet_name='Scraped Data', startrow=startrow)
-            writer.close()
-        except Exception as e:
-            print(f"Error loading workbook: {e}")
-    else:
-        try:
-            writer = pd.ExcelWriter(file_path, engine='openpyxl')
-            df.to_excel(writer, index=False, header=True, sheet_name='Scraped Data')
-            writer.close()
-        except Exception as e:
-            print(f"Error saving Excel file: {e}")
+            df.to_excel(writer, index=False, header=startrow == 0, sheet_name='Scraped Data', startrow=startrow) 
 
-    print(f"File saved at: {file_path}")
+            # Check if selling_data dictionary is not empty
+            if selling_data:
+                # Create a new DataFrame for the selling data
+                selling_df = pd.DataFrame(list(selling_data.items()), columns=["Listing Numbers", "Selling Dates"]) 
+
+                # Write the selling data to a new sheet
+                selling_df.to_excel(writer, index=False, header=True, sheet_name='Selling Data') 
+
+            writer.close()
+        except Exception as e:
+            print(f"Error loading workbook: {e}")
+    else:
+        try:
+            writer = pd.ExcelWriter(file_path, engine='openpyxl')
+            df.to_excel(writer, index=False, header=True, sheet_name='Scraped Data') 
+
+            # Check if selling_data dictionary is not empty
+            if selling_data:
+                # Create a new DataFrame for the selling data
+                selling_df = pd.DataFrame(list(selling_data.items()), columns=["Listing Numbers", "Selling Dates"]) 
+
+                # Write the selling data to a new sheet
+                selling_df.to_excel(writer, index=False, header=True, sheet_name='Selling Data') 
+
+            writer.close()
+        except Exception as e:
+            print(f"Error saving Excel file: {e}") 
+
+    print(f"File saved at: {file_path}")
 
 # Main function
 def main():
-    store_url = input("Enter the URL of the TradeMe store: ").strip()
+    store_url = input("Enter the URL of the TradeMe store: ").strip() 
 
-    print(f"Processing store: {store_url}")
-    try:
-        product_links = get_all_product_links(store_url)
-        print(f"Total products found: {len(product_links)}")
+    print(f"Processing store: {store_url}")
+    try:
+        product_links = get_all_product_links(store_url)
+        print(f"Total products found: {len(product_links)}") 
 
-        selling_data = get_selling_data(driver)
+        selling_data = get_selling_data(driver) 
 
-        all_data = []
-        for idx, link in enumerate(product_links, start=1):
-            try:
-                product_data = get_product_info(link, selling_data)
-                all_data.append(product_data)
-                print(f"Successfully processed data for product: {link} [{idx}/{len(product_links)}]")  # Updated print statement
-            except Exception as e:
-                print(f"An error occurred with product URL {link}: {e}")
+        all_data = []
+        for idx, link in enumerate(product_links, start=1):
+            try:
+                product_data = get_product_info(link, selling_data)
+                all_data.append(product_data)
+                print(f"Successfully processed data for product: {link} [{idx}/{len(product_links)}]")  # Updated print statement
+            except Exception as e:
+                print(f"An error occurred with product URL {link}: {e}") 
 
-        save_to_excel(all_data)
-        print(f"Data saved to Excel file.")
+        save_to_excel(all_data, selling_data)
+        print(f"Data saved to Excel file.") 
 
-    except Exception as e:
-        print(f"An error occurred with store URL {store_url}: {e}")
-
+    except Exception as e:
+        print(f"An error occurred with store URL {store_url}: {e}")
 service = Service(ChromeDriverManager().install())
 driver = webdriver.Chrome(service=service, options=chrome_options)
 main()
