@@ -1,4 +1,3 @@
-#added graphical user interface
 import os
 import sys
 import re
@@ -7,9 +6,8 @@ from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QLabel,
     QLineEdit, QPushButton, QTextEdit, QMessageBox, QStackedWidget
 )
-from PyQt5.QtCore import QThread, pyqtSignal, Qt
-from PyQt5.QtGui import QFont, QIcon
-
+from PyQt5.QtCore import QThread, pyqtSignal, Qt  # Import Qt for alignment
+from PyQt5.QtGui import QFont, QPixmap, QIcon  # Import QFont for font settings
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -19,11 +17,10 @@ from webdriver_manager.chrome import ChromeDriverManager
 import time
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
+from PyQt5.QtGui import QIcon
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-
 
 class ScraperApp(QMainWindow):
     def __init__(self):
@@ -39,21 +36,12 @@ class ScraperApp(QMainWindow):
         self.setCentralWidget(self.central_widget)
         self.layout = QVBoxLayout(self.central_widget)
 
-        # Dark gray background
-        self.setStyleSheet("background-color: #2e2e2e; color: white;")
-
         # Navbar setup
         self.navbar = QHBoxLayout()
         self.home_button = QPushButton("Home")
         self.instruction_button = QPushButton("Instruction")
         self.documentation_button = QPushButton("Documentation")
         self.contact_button = QPushButton("Contact")
-
-        # Adding styles for navbar buttons (gray by default, white with black text on hover)
-        self.set_button_styles(self.home_button)
-        self.set_button_styles(self.instruction_button)
-        self.set_button_styles(self.documentation_button)
-        self.set_button_styles(self.contact_button)
 
         self.navbar.addWidget(self.home_button)
         self.navbar.addWidget(self.instruction_button)
@@ -83,21 +71,6 @@ class ScraperApp(QMainWindow):
         self.documentation_button.clicked.connect(lambda: self.pages.setCurrentIndex(2))
         self.contact_button.clicked.connect(lambda: self.pages.setCurrentIndex(3))
 
-    def set_button_styles(self, button):
-        # Gray background with hover effect (white background, black text)
-        button.setStyleSheet("""
-            QPushButton {
-                background-color: #4f4f4f;
-                color: white;
-                border-radius: 5px;
-                padding: 8px;
-            }
-            QPushButton:hover {
-                background-color: white;
-                color: black;
-            }
-        """)
-
     def createHomePage(self):
         home_page = QWidget()
         layout = QVBoxLayout(home_page)
@@ -114,19 +87,6 @@ class ScraperApp(QMainWindow):
 
         self.start_button = QPushButton("Start Scraping")
         self.start_button.clicked.connect(self.startScraping)
-        
-        # Start Scraping button style (dark blue with light blue on hover)
-        self.start_button.setStyleSheet("""
-            QPushButton {
-                background-color: #003366;
-                color: white;
-                border-radius: 8px;
-                padding: 10px;
-            }
-            QPushButton:hover {
-                background-color: #3399ff;
-            }
-        """)
 
         self.log_text = QTextEdit()
         self.log_text.setReadOnly(True)
@@ -147,8 +107,9 @@ class ScraperApp(QMainWindow):
         instruction_page = QWidget()
         layout = QVBoxLayout(instruction_page)
 
+        # Setting a font for the text
         font = QFont()
-        font.setPointSize(12)
+        font.setPointSize(12)  # Increase font size for better readability
         font.setBold(True)
 
         instructions = QLabel(
@@ -156,16 +117,17 @@ class ScraperApp(QMainWindow):
             "1) Trademe: On the Trademe website, go to the store you want to scrape. Scroll to the bottom; there will be pages (like 1 2 3 4 Next). Go to page 2, then go back to page 1. Paste this link of page 1 in this software.<br>"
             "2) Bidbud: Make sure you enter the link ending with /selling.<br>"
             "3) Email: Ensure you write the correct email.<br>"
-            "4) File Location: Two files will be generated at the end. Both will be stored in the 'content' folder of the drive where you installed the software.<br>"
+            "4) File Location: Two files will be generated at the end. Both will be stored in the 'content' folder of the drive where you installed the software. If you can't find the files, search for 'content/bidbud' or 'content/trademe' on your PC.<br>"
+            "5) Start Time: After clicking on the 'Start Scraping' button, the software will take 2 to 3 minutes to start.<br>"
+            "6) New Scraping: Whenever you start a new scraping session, make sure to move previous files out of the content folder.<br>"
+            "7) VPN: for good quality work and faster execution paid vpn is required.<br>"
         )
 
         instructions.setFont(font)
         instructions.setWordWrap(True)
-        instructions.setStyleSheet("color: white;")  # Text in white
-
         layout.addWidget(instructions)
-        layout.setContentsMargins(10, 10, 10, 10)
-        layout.setAlignment(instructions, Qt.AlignTop)
+        layout.setContentsMargins(10, 10, 10, 10)  # Add padding around the text
+        layout.setAlignment(instructions, Qt.AlignTop)  # Align the text to the top
 
         return instruction_page
 
@@ -179,15 +141,21 @@ class ScraperApp(QMainWindow):
 
         doc_label = QLabel(
             "<b>Documentation:</b><br>"
-            "1) Platform: Windows only.<br>"
-            "2) Testing: The software was tested thoroughly.<br>"
-            "3) Summary: Detailed description of all versions.<br>"
+            "1) Platform: This software is designed for Windows only. It will not work on macOS or any other platform.<br>"
+            "2) Testing: The software was tested over 100 times after each step before delivery.<br>"
+            "3) Summary of All Versions:<br>"
+            "   - Version 1: Unlimited rows + cloud processing for faster execution.<br>"
+            "   - Version 2: Added dynamic waiting at some points instead of fixed waiting.<br>"
+            "   - Version 3: Removed unnecessary columns and console messages, and cleaned up the software.<br>"
+            "   - Version 4: Combined two different software (Bidbud and Trademe) into a single software.<br>"
+            "   - Version 5: Added email functionality.<br>"
+            "   - Version 6: Added a graphical user interface.<br>"
+            "4) Updates: The software extracts data based on the website's CSS. If the website's CSS is updated, some functionality may stop working. If this happens, the software needs to be updated.<br>"
+            "5) Dependencies: How well this software works depends upon your internet connection, vpn quality, computer power.<br>"
         )
 
         doc_label.setFont(font)
         doc_label.setWordWrap(True)
-        doc_label.setStyleSheet("color: white;")  # Text in white
-
         layout.addWidget(doc_label)
         layout.setContentsMargins(10, 10, 10, 10)
         layout.setAlignment(doc_label, Qt.AlignTop)
@@ -202,18 +170,17 @@ class ScraperApp(QMainWindow):
         font.setPointSize(12)
         font.setBold(True)
 
+        # Using HTML formatting to make links clickable
         contact_label = QLabel(
             "<b>Contact Developer:</b><br>"
             "Phone: 0329-2555574 (No Calls Please)<br>"
             "Mail: <a href='mailto:hameednouman12@gmail.com'>hameednouman12@gmail.com</a><br>"
             "GitHub: <a href='https://github.com/nouman6093'>https://github.com/nouman6093</a><br>"
-            "LinkedIn: <a href='https://www.linkedin.com/in/nouman6093/'>LinkedIn</a>"
+            "LinkedIn: <a href='https://www.linkedin.com/in/nouman6093/'>https://www.linkedin.com/in/nouman6093/</a>"
         )
 
         contact_label.setFont(font)
         contact_label.setOpenExternalLinks(True)
-        contact_label.setStyleSheet("color: white;")  # Links in white
-
         layout.addWidget(contact_label)
         layout.setContentsMargins(10, 10, 10, 10)
         layout.setAlignment(contact_label, Qt.AlignTop)
@@ -261,9 +228,8 @@ class ScraperApp(QMainWindow):
             cursor.movePosition(cursor.End)
             cursor.movePosition(cursor.Start, cursor.KeepAnchor, self.log_text.document().blockCount() - max_lines)
             cursor.removeSelectedText()
-            cursor.deleteChar()
+            cursor.deleteChar()  # Remove the final newline
             self.log_text.setTextCursor(cursor)
-
 
 class ScraperThread(QThread):
     progress_signal = pyqtSignal(str)
@@ -339,13 +305,18 @@ class ScraperThread(QThread):
             current_page_url = f"{store_url}&page={page_number}" if page_number > 1 else store_url
             self.log(f"Accessing: {current_page_url}")
             self.driver.get(current_page_url)
-            time.sleep(2)
+            time.sleep(2)  # Allow time for the page to load
 
             try:
+                # Check if the products are present
                 WebDriverWait(self.driver, 20).until(
-                    EC.presence_of_element_located((By.CSS_SELECTOR, "a.tm-marketplace-search-card__detail-section--link"))
+                    EC.presence_of_element_located(
+                        (By.CSS_SELECTOR, "a.tm-marketplace-search-card__detail-section--link"))
                 )
-                product_elements = self.driver.find_elements(By.CSS_SELECTOR, "a.tm-marketplace-search-card__detail-section--link")
+                product_elements = self.driver.find_elements(By.CSS_SELECTOR,
+                                                             "a.tm-marketplace-search-card__detail-section--link")
+
+                # Check if no product elements are found
                 if not product_elements:
                     self.log("No more products found.")
                     break
@@ -355,7 +326,10 @@ class ScraperThread(QThread):
                 page_number += 1
 
             except Exception as e:
-                if "no results found" in self.driver.page_source.lower():
+                # Check for "No more Pages" message or handle the error
+                page_source = self.driver.page_source
+
+                if "no results found" in page_source.lower() or "page not found" in page_source.lower():
                     self.log("No more Pages Found.")
                 else:
                     self.log(f"Error extracting product links: {e}")
@@ -384,13 +358,20 @@ class ScraperThread(QThread):
                 images.append(self.get_image(i))
 
             details = self.get_text(By.CSS_SELECTOR, '.o-rack-item__secondary')
+
+            # Updated code for shipping details
             shipping = self.get_shipping()
+
+            # Watchlist count added back using BeautifulSoup as in the old code
             watchlist = self.get_watchlist_count_with_bs4()
+
+            # Page views
             page_views = self.get_text(By.CSS_SELECTOR, '.tm-share-listing-link__info-block b')
         except Exception as e:
             self.log(f"Error extracting product information from {url}: {e}")
             return {}
 
+        # Ensuring the data dictionary contains 17 columns, including all 5 image URLs
         data = {
             "Link": url,
             "Listing Number": listing_number,
@@ -408,24 +389,26 @@ class ScraperThread(QThread):
             "Details": details,
             "Description": description,
             "Shipping": shipping,
-            "Watchlist": watchlist,
+            "Watchlist": watchlist,  # Added watchlist
             "Page Views": page_views,
         }
 
         return data
 
+    # Watchlist extraction using BeautifulSoup (old code)
     def get_watchlist_count_with_bs4(self):
         page_source = self.driver.page_source
         soup = BeautifulSoup(page_source, 'html.parser')
         try:
             watch_list_element = soup.select_one('p.tm-marketplace-buyer-options__watchers-count strong')
-            return watch_list_element.text.strip() if watch_list_element else 'N/A'
+            watch_list_count = watch_list_element.text.strip() if watch_list_element else 'N/A'
+            return watch_list_count
         except Exception as e:
             self.log(f"Error scraping watchlist count: {e}")
             return 'N/A'
 
     def save_to_excel(self, all_data, filename):
-        content_folder = os.path.join("D:\\content")
+        content_folder = os.path.join("D:\\content")  # Adjust this path as needed
         os.makedirs(content_folder, exist_ok=True)
         file_path = os.path.join(content_folder, filename)
         df = pd.DataFrame(all_data)
@@ -515,6 +498,7 @@ class ScraperThread(QThread):
         except:
             return 'N/A'
 
+    # Shipping extraction using the old CSS selectors (updated)
     def get_shipping(self):
         try:
             shipping_elements = self.driver.find_elements(By.CSS_SELECTOR, 'tbody tr')
@@ -527,7 +511,6 @@ class ScraperThread(QThread):
             return '\n'.join(shipping_data) if shipping_data else 'N/A'
         except:
             return 'N/A'
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
