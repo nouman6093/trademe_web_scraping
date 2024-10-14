@@ -6,13 +6,13 @@
 
 ## Summary
 
-Version 1 = unlimited rows + cloud processing for faster scraping
-Version 2 = at some points added dynamic waiting instead of fixed
-Version 3 = removed unneccasry info like sold dates column, removed unworking sheet 2 mechanism
-Version 4 = combined 2 softwares (bidbud + trademe) into a single software
-Version 5 = added email functionality
-Version 6 = added graphical user interface software would run as desktop application instead of pycharm
-Version 7 = deployed on web server. software would run on web browser instead of desktop application. meaning software would run on any device even phone (upcoming)
+1) Version 1 = unlimited rows + cloud processing for faster scraping.
+2) Version 2 = at some points added dynamic waiting instead of fixed.
+3) Version 3 = removed unneccasry info like sold dates column, removed unworking sheet 2 mechanism.
+4) Version 4 = combined 2 softwares (bidbud + trademe) into a single software.
+5) Version 5 = added email functionality.
+6) Version 6 = added graphical user interface software would run as desktop application instead of pycharm.
+7) Version 7 = deployed on web server. software would run on web browser instead of desktop application. meaning software would run on any device even phone (upcoming).
 
 
 ## Instructions
