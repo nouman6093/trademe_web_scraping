@@ -1,0 +1,65 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+import pandas as pd
+import os
+import time
+
+def save_to_excel(data, filename="bidbud_feedback_file.xlsx"):
+    file_path = os.path.join("/content/", filename)
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    df = pd.DataFrame(data, columns=["Username", "Listing Number", "Date", "Feedback"])
+    df.to_excel(file_path, index=False)
+    print(f"Data saved to {file_path}")
+
+def scrape_bidbud_feedback(driver):
+    feedback_data = []
+    last_height = driver.execute_script("return document.body.scrollHeight")
+    counter = 1  # Initialize a counter
+
+    while True:
+        rows = driver.find_elements(By.CSS_SELECTOR, 'table#feedback_table tr')
+        for row in rows:
+            try:
+                username = row.find_element(By.CSS_SELECTOR, 'a[title="View member\'s listings"]').text.strip()
+                listing_number_tag = row.find_element(By.CSS_SELECTOR, 'td.nowrap.hidden-xs a')
+                listing_number = listing_number_tag.text.strip() if listing_number_tag else "N/A"
+                date = row.find_element(By.CSS_SELECTOR, 'td.align-right').text.strip()
+                feedback = row.find_element(By.CSS_SELECTOR, 'td.wordwrap').text.strip()
+
+                feedback_data.append([username, listing_number, date, feedback])
+                print(f"{counter}) Scraped: {username}, {listing_number}, {date}, {feedback}")
+                counter += 1  # Increment the counter after each row is processed
+            except Exception as e:
+                continue
+
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(3)
+        new_height = driver.execute_script("return document.body.scrollHeight")
+        if new_height == last_height:
+            break
+        last_height = new_height
+
+    return feedback_data
+
+def run_scraper():
+    link = input("Enter link of feedback section of a store from Bidbud: ")
+    if not link.endswith('/selling'):
+        print("Error: The link must end with '/selling'. Please provide the correct link.")
+        return
+
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--no-sandbox")
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+    driver.get(link)
+    feedback_data = scrape_bidbud_feedback(driver)
+    save_to_excel(feedback_data)
+    driver.quit()
+
+if __name__ == "__main__":
+    run_scraper()
