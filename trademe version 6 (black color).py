@@ -1,3 +1,4 @@
+#added graphical user interface
 import os
 import sys
 import re
@@ -155,7 +156,10 @@ class ScraperApp(QMainWindow):
             "1) Trademe: On the Trademe website, go to the store you want to scrape. Scroll to the bottom; there will be pages (like 1 2 3 4 Next). Go to page 2, then go back to page 1. Paste this link of page 1 in this software.<br>"
             "2) Bidbud: Make sure you enter the link ending with /selling.<br>"
             "3) Email: Ensure you write the correct email.<br>"
-            "4) File Location: Two files will be generated at the end. Both will be stored in the 'content' folder of the drive where you installed the software.<br>"
+            "4) File Location: Two files will be generated at the end. Both will be stored in the 'content' folder of the drive where you installed the software. If you can't find the files, search for 'content/bidbud' or 'content/trademe' on your PC.<br>"
+            "5) Start Time: After clicking on the 'Start Scraping' button, the software will take 2 to 3 minutes to start.<br>"
+            "6) New Scraping: Whenever you start a new scraping session, make sure to move previous files out of the content folder.<br>"
+            "7) VPN: for good quality work and faster execution paid vpn is required.<br>"
         )
 
         instructions.setFont(font)
@@ -178,9 +182,17 @@ class ScraperApp(QMainWindow):
 
         doc_label = QLabel(
             "<b>Documentation:</b><br>"
-            "1) Platform: Windows only.<br>"
-            "2) Testing: The software was tested thoroughly.<br>"
-            "3) Summary: Detailed description of all versions.<br>"
+            "1) Platform: This software is designed for Windows only. It will not work on macOS or any other platform.<br>"
+            "2) Testing: The software was tested over 100 times after each step before delivery.<br>"
+            "3) Summary of All Versions:<br>"
+            "   - Version 1: Unlimited rows + cloud processing for faster execution.<br>"
+            "   - Version 2: Added dynamic waiting at some points instead of fixed waiting.<br>"
+            "   - Version 3: Removed unnecessary columns and console messages, and cleaned up the software.<br>"
+            "   - Version 4: Combined two different software (Bidbud and Trademe) into a single software.<br>"
+            "   - Version 5: Added email functionality.<br>"
+            "   - Version 6: Added a graphical user interface.<br>"
+            "4) Updates: The software extracts data based on the website's CSS. If the website's CSS is updated, some functionality may stop working. If this happens, the software needs to be updated.<br>"
+            "5) Dependencies: How well this software works depends upon your internet connection, vpn quality, computer power.<br>"
         )
 
         doc_label.setFont(font)
